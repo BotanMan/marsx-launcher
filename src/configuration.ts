@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 process.env['SUPPRESS_NO_CONFIG_WARNING'] = 'true';
 import configModule from 'config';
 import _ from 'lodash';
@@ -29,7 +31,8 @@ export interface Config {
   importProjects: ImportProjectConfig[];
 }
 
-export class ConfigError extends Error {}
+export class ConfigError extends Error {
+}
 
 const ImportProjectSchema = yup.object({
   name: yup.string().required(),
@@ -74,7 +77,19 @@ function validateConfig(): Config {
     return ErrorThrowingConfig('Config file not found, ensure you have "config/default.json" file.');
   }
 
-  const configObject = configModule.util.toObject();
+  let envConfigObject: Partial<Config> = {};
+
+  try {
+    envConfigObject = ConfigSchema.cast(process.env, { stripUnknown: true }) as Partial<Config>;
+  } catch (err) {
+    console.log(chalk
+      .yellow('\nENV variables were ignored due to an error during casting ENV variables into Schema, ' +
+        'please cleanup ENV of fix the error'));
+    console.error(err);
+    console.log('\n');
+  }
+
+  const configObject = { ...envConfigObject, ...configModule.util.toObject() };
   try {
     return ConfigSchema.validateSync(configObject, { abortEarly: false, stripUnknown: false });
   } catch (e) {
