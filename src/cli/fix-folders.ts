@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { config } from '../configuration';
 import { readBlockFiles } from '../loader';
 import { V3MongoBlock } from '../utils/v3';
-import { Db, MongoClient } from 'mongodb';
+import { Db, MongoClient, ObjectId } from 'mongodb';
 
 async function getMongoDbConnection(): Promise<Db> {
   const mongoConn = await new MongoClient(config.mongoConn).connect();
@@ -16,6 +16,8 @@ export async function fixDbBlockFolders(safeRun: boolean = true) {
 
   let localBlocks = await readBlockFiles(config.blocksDir);
 
+  localBlocks = localBlocks.filter((l) => l.path.filePath.indexOf('_forked') === -1);
+
   console.log(`Got ${localBlocks.length} files to migrate`);
 
   const db = await getMongoDbConnection();
@@ -28,14 +30,15 @@ export async function fixDbBlockFolders(safeRun: boolean = true) {
     console.log(`Updating ${i + 1}/${localBlocks.length}`);
 
     try {
+      const blockId = new ObjectId(block.metadata['_id'] as string);
       if(!safeRun) {
         const res = await blockCollection
-          .updateOne({ _id: block.metadata['_id'] }, { $set: { Folder: block.path.folder } }, { upsert: true });
-        console.log(`Updated ${i + 1}/${localBlocks.length}, ${res.modifiedCount ? 'modified' : 'created ' + res.upsertedCount}`);
+          .updateOne({ _id: blockId }, { $set: { Folder: block.path.folder } }, { upsert: true });
+        console.log(`Updated ${i + 1}/${localBlocks.length}, ${blockId.toString()}, ${res.modifiedCount ? 'modified' : 'created ' + res.upsertedCount}`);
       }
       else{
         let dbBlock = await blockCollection
-          .findOne({ _id: block.metadata['_id'] });
+          .findOne({ _id: blockId });
 
         if(!dbBlock){
           dbBlock = {
