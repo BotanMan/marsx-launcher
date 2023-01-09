@@ -84,7 +84,7 @@ function validateConfig(): Config {
   } catch (err) {
     console.log(chalk
       .yellow('\nENV variables were ignored due to an error during casting ENV variables into Schema, ' +
-        'please cleanup ENV of fix the error'));
+        'please cleanup ENV or fix the error'));
     console.error(err);
     console.log('\n');
   }
