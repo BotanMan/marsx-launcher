@@ -77,6 +77,19 @@ function validateConfig(): Config {
     return ErrorThrowingConfig('Config file not found, ensure you have "config/default.json" file.');
   }
 
+  const configObject = { ...getConfigFromEnv(), ...configModule.util.toObject() };
+  try {
+    return ConfigSchema.validateSync(configObject, { abortEarly: false, stripUnknown: false });
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      return ErrorThrowingConfig(e.errors.join('\n'));
+    } else {
+      throw e;
+    }
+  }
+}
+
+function getConfigFromEnv(): Partial<Config> {
   let envConfigObject: Partial<Config> = {};
 
   try {
@@ -89,16 +102,7 @@ function validateConfig(): Config {
     console.log('\n');
   }
 
-  const configObject = { ...envConfigObject, ...configModule.util.toObject() };
-  try {
-    return ConfigSchema.validateSync(configObject, { abortEarly: false, stripUnknown: false });
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      return ErrorThrowingConfig(e.errors.join('\n'));
-    } else {
-      throw e;
-    }
-  }
+  return envConfigObject;
 }
 
 export const config = validateConfig();
