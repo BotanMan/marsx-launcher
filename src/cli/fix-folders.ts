@@ -1,14 +1,8 @@
 import chalk from 'chalk';
-// import { MongoClient } from 'mongodb';
 import { config } from '../configuration';
-// import { V3MongoBlock } from '../utils/v3';
 import { readBlockFiles } from '../loader';
 import { V3MongoBlock } from '../utils/v3';
 import { Db, MongoClient } from 'mongodb';
-
-// async function migrateBlocks() {
-//   const localBlocks = await readBlockFiles(config.blocksDir);
-// }
 
 async function getMongoDbConnection(): Promise<Db> {
   const mongoConn = await new MongoClient(config.mongoConn).connect();
