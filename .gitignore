@@ -1,6 +1,9 @@
 node_modules
 dist
 
+blocks
+config
+
 # OS metadata
 .DS_Store
 Thumbs.db

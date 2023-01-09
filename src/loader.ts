@@ -56,7 +56,7 @@ async function readBlockFile(blocksDir: string, filePath: string): Promise<SfcBl
   return parseSFC(relPath, content);
 }
 
-async function readBlockFiles(blocksDir: string) {
+export async function readBlockFiles(blocksDir: string) {
   const files = await listFilesRecursive(blocksDir);
   return await Promise.all(files.filter(f => !path.basename(f).startsWith('.')).map(f => readBlockFile(blocksDir, f)));
 }
