@@ -31,8 +31,7 @@ export interface Config {
   importProjects: ImportProjectConfig[];
 }
 
-export class ConfigError extends Error {
-}
+export class ConfigError extends Error {}
 
 const ImportProjectSchema = yup.object({
   name: yup.string().required(),
@@ -95,9 +94,11 @@ function getConfigFromEnv(): Partial<Config> {
   try {
     envConfigObject = ConfigSchema.cast(process.env, { stripUnknown: true }) as Partial<Config>;
   } catch (err) {
-    console.log(chalk
-      .yellow('\nENV variables were ignored due to an error during casting ENV variables into Schema, ' +
-        'please cleanup ENV or fix the error'));
+    console.log(
+      chalk.yellow(
+        '\nENV variables were ignored due to an error during casting ENV variables into Schema, ' + 'please cleanup ENV or fix the error',
+      ),
+    );
     console.error(err);
     console.log('\n');
   }
