@@ -44,7 +44,7 @@
     "chalk": "^4.1.2",
     "commander": "^9.1.0",
     "json-stable-stringify": "^1.0.1",
-    "json5": "^2.2.0",
+    "json5": "^2.2.3",
     "minimist": ">=1.2.6",
     "yup": "^0.32.11"
   },
